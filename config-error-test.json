@@ -1,0 +1,25 @@
+{
+  "conversion": {
+    "input": {
+      "path": "sample/input.csv",
+      "encoding": "utf8",
+      "lineBreak": "lf",
+      "quote": "\"",
+      "hasHeader": false
+    },
+    "output": {
+      "path": "sample/output-error.csv",
+      "encoding": "utf8",
+      "lineBreak": "lf",
+      "quote": "\"",
+      "hasHeader": true
+    },
+    "conversionTable": "sample/conversion.csv",
+    "targetColumns": [1, 2],
+    "missingCharacterHandling": "skip"
+  },
+  "logging": {
+    "level": "info",
+    "output": "console"
+  }
+}
