@@ -34,17 +34,42 @@ export function initLogger(config: AppConfig["logging"]): winston.Logger {
 			fs.mkdirSync(logsDir, { recursive: true });
 		}
 
-		// ログファイル名の決定
-		const logFile =
-			config.logFile ||
-			path.join(
-				logsDir,
-				`csv-converter-${new Date().toISOString().split("T")[0]}.log`,
-			);
+		// 直近のログファイルを探し、10MB未満であれば使用、そうでなければ新規作成
+		const maxSize = 10 * 1024 * 1024; // 10MB
+		let logFilename = "";
+
+		const existingFiles = fs
+			.readdirSync(logsDir)
+			.filter((file) =>
+				file.match(/^csv-converter-\d{4}-\d{2}-\d{2}-\d{6}\.log$/),
+			)
+			.sort()
+			.reverse(); // 新しい順にソート
+
+		if (existingFiles.length > 0 && existingFiles[0]) {
+			const latestFile = path.join(logsDir, existingFiles[0]);
+			const stats = fs.statSync(latestFile);
+			if (stats.size < maxSize) {
+				logFilename = latestFile;
+			}
+		}
+
+		// 新しいファイル名を生成（直近ファイルが10MB以上または存在しない場合）
+		if (!logFilename) {
+			const timestamp = new Date()
+				.toISOString()
+				.replace(/:/g, "")
+				.replace(/\./g, "")
+				.replace("T", "-")
+				.slice(0, 17);
+			logFilename = path.join(logsDir, `csv-converter-${timestamp}.log`);
+		}
 
 		transports.push(
 			new winston.transports.File({
-				filename: logFile,
+				filename: logFilename,
+				maxsize: maxSize,
+				maxFiles: 5,
 				format: winston.format.combine(
 					winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
 					winston.format.printf(({ timestamp, level, message }) => {
@@ -54,8 +79,7 @@ export function initLogger(config: AppConfig["logging"]): winston.Logger {
 			}),
 		);
 
-		// ファイルパスをコンソールに表示（初回のみ）
-		console.log(`ログファイル: ${path.resolve(logFile)}`);
+		console.log(`ログファイル: ${path.resolve(logFilename)}`);
 	}
 
 	logger = winston.createLogger({

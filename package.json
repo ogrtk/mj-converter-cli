@@ -26,6 +26,7 @@
     "csv-stringify": "^6.6.0",
     "iconv-lite": "^0.7.0",
     "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
     "yargs": "^18.0.0"
   },
   "devDependencies": {

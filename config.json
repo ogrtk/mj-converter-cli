@@ -15,8 +15,11 @@
       "hasHeader": true
     },
     "conversionTable": "sample/conversion.csv",
-    "targetColumns": [1, 2],
-    "missingCharacterHandling": "warn"
+    "targetColumns": [
+      1,
+      2
+    ],
+    "missingCharacterHandling": "skip"
   },
   "logging": {
     "level": "info",
