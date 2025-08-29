@@ -28,6 +28,10 @@ coverage/
 # nyc test coverage
 .nyc_output
 
+# Test temporary files
+tests/fixtures/temp/
+tests/fixtures/integration/
+
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 

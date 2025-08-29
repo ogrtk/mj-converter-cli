@@ -32,7 +32,15 @@ npm run build
 # ビルド済みCLI実行
 npm start
 
-# リント・テストコマンドは利用不可 (テストは未設定)
+# コード品質管理
+npm run lint      # コードチェック
+npm run lint:fix  # 自動修正付きコードチェック
+npm run format    # コードフォーマット
+
+# テスト実行
+npm test          # インタラクティブテスト実行
+npm run test:run  # 一回のみテスト実行
+npm run test:coverage  # カバレッジ付きテスト実行
 ```
 
 ## 設定システム
@@ -72,6 +80,24 @@ npm start
 - **操作レベル**: 詳細なエラー報告を含むtry-catchブロック
 - **文字レベル**: 変換文字欠落の設定可能な処理
 
+## テスト構成
+
+包括的なVitestベースのテストスイートが実装されています：
+- **ユニットテスト**: `tests/unit/` - 各モジュールの単体テスト
+- **統合テスト**: `tests/integration/` - エンドツーエンドテスト
+- **テストフィクスチャ**: `tests/fixtures/` - テスト用データファイル
+- **カバレッジレポート**: `coverage/` - HTML形式のカバレッジレポート
+
+テスト設定は `vitest.config.ts` で管理され、TypeScript/ESMネイティブ対応です。
+
 ## サンプルファイル
 
 `sample/` ディレクトリには、変換プロセスをテストするためのサンプル入力ファイル、変換表、期待される出力が含まれています。
+
+## プロジェクト設定ファイル
+
+- `package.json` - NPMパッケージ設定、依存関係、スクリプト定義
+- `tsconfig.json` - TypeScript設定（ES2022、ESNext、strict mode）
+- `vitest.config.ts` - Vitestテスト設定
+- `.gitignore` - Git除外ファイル設定
+- `LICENSE` - MIT License

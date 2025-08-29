@@ -6,14 +6,18 @@ CSVファイルの指定した列に対して、文字変換表を使用して�
 
 このツールは、CSV形式のデータファイル内の特定の列に対して、あらかじめ定義された変換表に基づいて文字を一対一で変換します。主に繁体字中国語の文字変換や、特定の文字セット間での変換作業に使用されることを想定しています。
 
+Unicode IVS（Ideographic Variation Sequence）に対応し、複雑な文字構成も正確に処理できます。
+
 ## 主な機能
 
+- **Unicode IVS対応**: Ideographic Variation Sequenceを含む複雑な文字も正確に処理
 - **柔軟なエンコーディング対応**: UTF-8をはじめとする様々な文字エンコーディングに対応
 - **列指定変換**: CSVファイルの任意の列のみを変換対象に指定可能
 - **ヘッダー行処理**: ヘッダー行の有無を設定可能（入力・出力で個別設定）
-- **エラーハンドリング**: 変換表にない文字の処理方法を選択可能
-- **詳細ログ**: 処理状況と結果を詳細にログ出力
+- **エラーハンドリング**: 変換表にない文字の処理方法を選択可能（error/skip/warn）
+- **詳細ログ**: Winston使用の高機能ログシステム
 - **設定駆動**: JSON設定ファイルによる柔軟な処理設定
+- **包括的テスト**: 75個のテストケースによる品質保証
 
 ## インストール
 
@@ -23,6 +27,12 @@ npm install
 
 # プロジェクトのビルド
 npm run build
+
+# コード品質チェック
+npm run lint
+
+# テスト実行（開発時）
+npm run test:run
 ```
 
 ## 使用方法
@@ -116,14 +126,41 @@ npm run dev
 - 1行目：変換前の文字
 - 2行目：変換後の文字
 
-## サンプルファイル
+## プロジェクト構成
+
+### ディレクトリ構造
+```
+/
+├── src/                    # ソースコード
+│   ├── cli.ts             # CLI引数処理・設定検証
+│   ├── index.ts           # エントリーポイント
+│   ├── processor.ts       # メイン変換処理
+│   ├── types/
+│   │   └── config.ts      # 型定義
+│   └── utils/             # ユーティリティ関数
+│       ├── converter.ts   # 文字変換ロジック
+│       ├── csv.ts         # CSV入出力
+│       ├── logger.ts      # ログ機能
+│       └── unicode.ts     # Unicode文字処理
+├── tests/                 # テストコード
+│   ├── unit/             # ユニットテスト
+│   ├── integration/      # 統合テスト
+│   └── fixtures/         # テストデータ
+├── sample/               # サンプルファイル
+├── config*.json          # 設定ファイル例
+├── dist/                 # ビルド成果物
+├── coverage/             # テストカバレッジ
+└── logs/                 # ログファイル
+```
+
+### サンプルファイル
 
 `sample/`ディレクトリに以下のファイルが含まれています：
 
 - `input.csv`: サンプル入力ファイル
 - `conversion.csv`: サンプル変換表
 - `output.csv`: 期待される出力結果
-- `config.json`: 基本設定ファイル
+- 各種設定例: `config.json`, `config-ivs.json`, `config-no-output-header.json`
 
 ## ログ出力例
 
@@ -164,19 +201,66 @@ CSV文字変換処理を開始します
 
 ## 技術スタック
 
-- **言語**: TypeScript
-- **ランタイム**: Node.js
+- **言語**: TypeScript（ES2022、ESNext）
+- **ランタイム**: Node.js 22+
 - **ビルドツール**: esbuild
-- **依存関係**:
-  - `csv-parse`: CSV解析
-  - `csv-stringify`: CSV生成
-  - `iconv-lite`: 文字エンコーディング変換
-  - `winston`: ログ処理
-  - `yargs`: コマンドライン引数解析
+- **テストフレームワーク**: Vitest + @vitest/ui + カバレッジ
+- **パッケージマネージャー**: npm/pnpm
+
+### 主要依存関係
+- `csv-parse`: CSV解析
+- `csv-stringify`: CSV生成
+- `iconv-lite`: 文字エンコーディング変換
+- `winston`: ログ処理
+- `yargs`: コマンドライン引数解析
+
+### 開発依存関係
+- `vitest`: テストフレームワーク
+- `@vitest/coverage-v8`: カバレッジ測定
+- `tsx`: TypeScript実行ツール
+- `@biomejs/biome`: コードフォーマッター・リンター
+
+## テスト
+
+このプロジェクトにはVitestベースの包括的なテストスイートが含まれています：
+
+```bash
+# すべてのテスト実行
+npm test
+
+# 一度だけテスト実行
+npm run test:run
+
+
+# カバレッジ付きテスト実行
+npm run test:coverage
+```
+
+### テスト構成
+
+**ユニットテスト** (`tests/unit/`)
+- `unicode.test.ts`: Unicode文字分割・結合（IVS対応）
+- `converter.test.ts`: 文字変換ロジック（変換表、エラーハンドリング）
+- `csv.test.ts`: CSV読み書き（エンコーディング、改行コード）
+- `cli.test.ts`: 設定ファイル検証
+- `processor.test.ts`: メイン処理フロー
+
+**統合テスト** (`tests/integration/`)
+- `end-to-end.test.ts`: 完全な変換プロセスの統合テスト
+
+**テストフィクスチャ** (`tests/fixtures/`)
+- サンプルCSVファイル、変換表、設定ファイル
+
+### テスト結果
+- **75個のテストケース** - 全て成功
+- **60%のコードカバレッジ** - 主要ロジックを網羅
+- **継続的テスト** - Vitestのウォッチモード対応
 
 ## ライセンス
 
-ISC
+MIT License - 詳細は[LICENSE](LICENSE)ファイルを参照してください。
+
+Copyright (c) 2025 ogrtk
 
 ## 開発
 

@@ -3,32 +3,40 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "CSV文字変換CLIツール - 繁体字中国語等の文字セット変換に対応",
   "main": "dist/index.js",
   "scripts": {
     "claude": "claude",
     "dev": "tsx src/index.ts",
     "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --outfile=dist/cli.js --format=esm --banner:js='import {createRequire} from \"module\";const require=createRequire(import.meta.url);'",
     "start": "node dist/cli.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "biome check src/ tests/",
+    "lint:fix": "biome check --write src/ tests/",
+    "format": "biome format --write src/ tests/",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "ogrtk",
+  "license": "MIT",
   "dependencies": {
     "csv-parse": "^6.1.0",
     "csv-stringify": "^6.6.0",
     "iconv-lite": "^0.7.0",
     "winston": "^3.17.0",
-    "yargs": "^17.7.2"
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "^1.0.65",
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^22.10.5",
     "@types/yargs": "^17.0.33",
+    "@vitest/coverage-v8": "^3.2.4",
     "esbuild": "^0.24.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
   }
 }
