@@ -1,10 +1,15 @@
-import * as fs from "node:fs";
-import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AppConfig } from "../../src/types/config.js";
 
-// CLIモジュールをモック化（メイン関数は実行させない）
-vi.mock("../../../src/utils/logger.js", () => ({
+// node:fsモジュール全体をモック化
+vi.mock("node:fs", () => ({
+	existsSync: vi.fn(),
+	readFileSync: vi.fn(),
+	mkdirSync: vi.fn(),
+}));
+
+// CLIモジュールをモック化
+vi.mock("../../src/utils/logger.js", () => ({
 	initLogger: vi.fn(() => ({
 		info: vi.fn(),
 		warn: vi.fn(),
@@ -19,7 +24,7 @@ vi.mock("../../../src/utils/logger.js", () => ({
 	})),
 }));
 
-vi.mock("../../../src/processor.js", () => ({
+vi.mock("../../src/processor.js", () => ({
 	processConversion: vi.fn(() =>
 		Promise.resolve({
 			success: true,

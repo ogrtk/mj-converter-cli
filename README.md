@@ -39,6 +39,7 @@ npm run test:run
 
 ### 基本的な使用方法
 
+**Linux/macOS:**
 ```bash
 # デフォルトの設定ファイル (config.json) を使用
 npm start
@@ -50,12 +51,26 @@ npm start -- --config my-config.json
 npm start -- --config config.json --verbose
 ```
 
+**Windows:**
+```batch
+# デフォルトの設定ファイル (config.json) を使用
+run.bat
+
+# 設定ファイルを指定
+run.bat my-config.json
+```
+
 ### 開発モード
 
 ```bash
 # TypeScriptファイルを直接実行（開発時）
 npm run dev
 ```
+
+### 終了コード
+- **0**: 正常完了
+- **1**: エラー発生
+- **2**: 警告付き完了（処理は完了したが警告あり）
 
 ## 設定ファイル
 

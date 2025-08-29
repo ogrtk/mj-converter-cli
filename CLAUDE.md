@@ -32,6 +32,9 @@ npm run build
 # ビルド済みCLI実行
 npm start
 
+# Windows用実行 (batファイル)
+run.bat [設定ファイルパス]
+
 # コード品質管理
 npm run lint      # コードチェック
 npm run lint:fix  # 自動修正付きコードチェック
@@ -42,6 +45,12 @@ npm test          # インタラクティブテスト実行
 npm run test:run  # 一回のみテスト実行
 npm run test:coverage  # カバレッジ付きテスト実行
 ```
+
+## 終了コード
+
+- **0**: 正常完了
+- **1**: エラー発生（処理失敗）
+- **2**: 警告付き完了（処理は完了したが警告あり）
 
 ## 設定システム
 
