@@ -78,7 +78,7 @@ export async function writeCsv(
 				delimiter: ",",
 				record_delimiter: getLineBreakChar(config.lineBreak),
 				escape: config.quote,
-				quoted: true,
+				quoted: config.quoted ?? true,
 			});
 
 			stringifier.on("readable", () => {

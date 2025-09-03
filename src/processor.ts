@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import type { ConversionConfig } from "./types/config.js";
+import { validateEncoding } from "./utils/character-set.js";
 import {
-	type ConversionMap,
 	convertCsvRecord,
 	loadConversionTable,
 } from "./utils/converter.js";
@@ -48,6 +48,21 @@ export async function processConversion(
 		// 文字変換表を読み込み
 		const conversionMap = await loadConversionTable(config.conversionTable);
 		logger.info(`変換ルール数: ${conversionMap.size}件`);
+
+		// 文字エンコーディング検証（設定されている場合）
+		if (config.characterSetValidation?.enabled) {
+			if (!validateEncoding(config.characterSetValidation.targetEncoding)) {
+				throw new Error(
+					`サポートされていないエンコーディング: ${config.characterSetValidation.targetEncoding}`,
+				);
+			}
+			logger.info(
+				`文字エンコーディング検証を有効化: ${config.characterSetValidation.targetEncoding}`,
+			);
+			logger.info(
+				`未定義文字の処理方式: ${config.characterSetValidation.undefinedCharacterHandling}`,
+			);
+		}
 
 		// 入力CSVファイルを読み込み
 		logger.info("入力CSVファイルを読み込み中...");
@@ -121,6 +136,7 @@ export async function processConversion(
 					config.targetColumns,
 					conversionMap,
 					config.missingCharacterHandling,
+					config.characterSetValidation,
 				);
 				outputRecords.push(result.record);
 				if (result.hasWarnings) {
@@ -132,16 +148,26 @@ export async function processConversion(
 					logger.info(`処理中... ${processedDataRows}行完了`);
 				}
 			} catch (error) {
-				if (config.missingCharacterHandling === "error") {
-					logger.error(
-						`行${i + 1}の処理でエラー: ${error instanceof Error ? error.message : String(error)}`,
-					);
+				const errorMessage =
+					error instanceof Error ? error.message : String(error);
+				logger.error(`行${i + 1}の処理でエラー: ${errorMessage}`);
+
+				// 文字エンコーディング検証のエラーの場合は、undefinedCharacterHandlingが"error"なら停止
+				if (
+					config.characterSetValidation?.enabled &&
+					config.characterSetValidation.undefinedCharacterHandling ===
+						"error" &&
+					errorMessage.includes("に含まれません")
+				) {
 					throw error;
 				}
-				logger.error(
-					`行${i + 1}の処理でエラー: ${error instanceof Error ? error.message : String(error)}`,
-				);
-				// エラーが発生した行もそのまま出力
+
+				// 変換ルール関連のエラーの場合は、missingCharacterHandlingが"error"なら停止
+				if (config.missingCharacterHandling === "error") {
+					throw error;
+				}
+
+				// その他のエラーは警告として処理継続
 				outputRecords.push(record);
 				hasWarnings = true;
 			}

@@ -1,25 +1,33 @@
 {
   "conversion": {
     "input": {
-      "path": "sample/input.csv",
+      "path": "sample/sample-input.csv",
       "encoding": "utf8",
       "lineBreak": "lf",
       "quote": "\"",
       "hasHeader": true
     },
     "output": {
-      "path": "sample/output.csv",
+      "path": "sample/sample-output.csv",
       "encoding": "utf8",
       "lineBreak": "lf",
       "quote": "\"",
-      "hasHeader": true
+      "hasHeader": false,
+      "quoted": false
     },
-    "conversionTable": "sample/conversion.csv",
+    "conversionTable": "mojimap/hk-to-mj.csv",
     "targetColumns": [
       1,
-      2
+      2,
+      4
     ],
-    "missingCharacterHandling": "skip"
+    "missingCharacterHandling": "warn",
+    "characterSetValidation": {
+      "enabled": true,
+      "targetEncoding": "shift_jis",
+      "undefinedCharacterHandling": "warn",
+      "altChar": "?"
+    }
   },
   "logging": {
     "level": "info",

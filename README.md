@@ -12,12 +12,14 @@ Unicode IVS（Ideographic Variation Sequence）に対応し、複雑な文字構
 
 - **Unicode IVS対応**: Ideographic Variation Sequenceを含む複雑な文字も正確に処理
 - **柔軟なエンコーディング対応**: UTF-8をはじめとする様々な文字エンコーディングに対応
+- **文字エンコーディング検証**: iconv-liteによる特定エンコーディングへの変換可能性チェック
 - **列指定変換**: CSVファイルの任意の列のみを変換対象に指定可能
 - **ヘッダー行処理**: ヘッダー行の有無を設定可能（入力・出力で個別設定）
 - **エラーハンドリング**: 変換表にない文字の処理方法を選択可能（error/skip/warn）
+- **置換文字機能**: 変換できない文字を指定文字で置換可能
 - **詳細ログ**: Winston使用の高機能ログシステム
 - **設定駆動**: JSON設定ファイルによる柔軟な処理設定
-- **包括的テスト**: 75個のテストケースによる品質保証
+- **包括的テスト**: 107個のテストケースによる品質保証
 
 ## インストール
 
@@ -95,7 +97,13 @@ npm run dev
     },
     "conversionTable": "sample/conversion.csv",
     "targetColumns": [1, 2],
-    "missingCharacterHandling": "warn"
+    "missingCharacterHandling": "warn",
+    "characterSetValidation": {
+      "enabled": true,
+      "targetEncoding": "shift_jis",
+      "undefinedCharacterHandling": "warn",
+      "altChar": "?"
+    }
   },
   "logging": {
     "level": "info",
@@ -120,6 +128,13 @@ npm run dev
   - `error`: エラーで停止
   - `skip`: 変換をスキップ
   - `warn`: 警告を出力して継続
+- **characterSetValidation**: 文字エンコーディング検証設定（オプション）
+  - `enabled`: 検証機能の有効化
+  - `targetEncoding`: 対象エンコーディング（例: 'shift_jis', 'euc-jp'）
+  - `undefinedCharacterHandling`: 変換できない文字の処理方法
+    - `error`: エラーで停止
+    - `warn`: 警告を出力して継続
+  - `altChar`: 警告時の置換文字（省略時はそのまま出力）
 
 #### logging
 - **level**: ログレベル（error, warn, info, debug）
@@ -153,6 +168,7 @@ npm run dev
 │   ├── types/
 │   │   └── config.ts      # 型定義
 │   └── utils/             # ユーティリティ関数
+│       ├── character-set.ts # 文字エンコーディング検証
 │       ├── converter.ts   # 文字変換ロジック
 │       ├── csv.ts         # CSV入出力
 │       ├── logger.ts      # ログ機能
@@ -256,19 +272,21 @@ npm run test:coverage
 **ユニットテスト** (`tests/unit/`)
 - `unicode.test.ts`: Unicode文字分割・結合（IVS対応）
 - `converter.test.ts`: 文字変換ロジック（変換表、エラーハンドリング）
+- `character-set.test.ts`: 文字エンコーディング検証
 - `csv.test.ts`: CSV読み書き（エンコーディング、改行コード）
 - `cli.test.ts`: 設定ファイル検証
 - `processor.test.ts`: メイン処理フロー
 
 **統合テスト** (`tests/integration/`)
 - `end-to-end.test.ts`: 完全な変換プロセスの統合テスト
+- `character-set-integration.test.ts`: 文字エンコーディング検証統合テスト
 
 **テストフィクスチャ** (`tests/fixtures/`)
 - サンプルCSVファイル、変換表、設定ファイル
 
 ### テスト結果
-- **75個のテストケース** - 全て成功
-- **60%のコードカバレッジ** - 主要ロジックを網羅
+- **107個のテストケース** - 全て成功
+- **包括的カバレッジ** - 主要ロジックを網羅
 - **継続的テスト** - Vitestのウォッチモード対応
 
 ## ライセンス

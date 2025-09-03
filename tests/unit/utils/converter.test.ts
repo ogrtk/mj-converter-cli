@@ -158,6 +158,64 @@ describe("converter.js", () => {
 			expect(result.record).toEqual(["ID", "龙A", "凤B"]);
 			expect(result.hasWarnings).toBe(true);
 		});
+
+		it("文字エンコーディング検証を使用して変換する", () => {
+			const record = ["ID", "龍🙂"];
+			const characterSetValidation = {
+				enabled: true,
+				targetEncoding: "shift_jis",
+				undefinedCharacterHandling: "warn" as const,
+			};
+
+			const result = convertCsvRecord(
+				record,
+				[1],
+				conversionMap,
+				"warn",
+				characterSetValidation,
+			);
+			expect(result.record).toEqual(["ID", "龙🙂"]);
+			expect(result.hasWarnings).toBe(true);
+		});
+
+		it("文字エンコーディング検証で置換文字を使用する", () => {
+			const record = ["ID", "龍🙂"];
+			const characterSetValidation = {
+				enabled: true,
+				targetEncoding: "shift_jis",
+				undefinedCharacterHandling: "warn" as const,
+				altChar: "?",
+			};
+
+			const result = convertCsvRecord(
+				record,
+				[1],
+				conversionMap,
+				"warn",
+				characterSetValidation,
+			);
+			expect(result.record).toEqual(["ID", "龙?"]);
+			expect(result.hasWarnings).toBe(true);
+		});
+
+		it("文字エンコーディング検証でエラーが発生する場合", () => {
+			const record = ["ID", "龍🙂"];
+			const characterSetValidation = {
+				enabled: true,
+				targetEncoding: "shift_jis",
+				undefinedCharacterHandling: "error" as const,
+			};
+
+			expect(() => {
+				convertCsvRecord(
+					record,
+					[1],
+					conversionMap,
+					"warn",
+					characterSetValidation,
+				);
+			}).toThrow("が shift_jis に含まれません");
+		});
 	});
 
 	describe("loadConversionTable", () => {

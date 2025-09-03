@@ -221,5 +221,73 @@ describe("csv.js", () => {
 
 			await expect(writeCsv(data, config)).rejects.toThrow();
 		});
+
+		it("quoted: falseでダブルクォートなしで出力する", async () => {
+			const data = [
+				["ID", "Name", "Description"],
+				["1", "龍王", "說你好"],
+				["2", "鳳凰", "說再見"],
+			];
+
+			const config: FileConfig = {
+				path: testOutputPath,
+				encoding: "utf8",
+				lineBreak: "lf",
+				quote: '"',
+				hasHeader: true,
+				quoted: false,
+			};
+
+			await writeCsv(data, config);
+
+			const content = fs.readFileSync(testOutputPath, "utf8");
+			expect(content).toBe(
+				"ID,Name,Description\n1,龍王,說你好\n2,鳳凰,說再見\n",
+			);
+		});
+
+		it("quoted: trueでダブルクォートありで出力する", async () => {
+			const data = [
+				["ID", "Name", "Description"],
+				["1", "龍王", "說你好"],
+				["2", "鳳凰", "說再見"],
+			];
+
+			const config: FileConfig = {
+				path: testOutputPath,
+				encoding: "utf8",
+				lineBreak: "lf",
+				quote: '"',
+				hasHeader: true,
+				quoted: true,
+			};
+
+			await writeCsv(data, config);
+
+			const content = fs.readFileSync(testOutputPath, "utf8");
+			expect(content).toBe(
+				'"ID","Name","Description"\n"1","龍王","說你好"\n"2","鳳凰","說再見"\n',
+			);
+		});
+
+		it("quotedが未設定の場合はデフォルトでtrueとして動作する", async () => {
+			const data = [
+				["ID", "Name"],
+				["1", "龍王"],
+			];
+
+			const config: FileConfig = {
+				path: testOutputPath,
+				encoding: "utf8",
+				lineBreak: "lf",
+				quote: '"',
+				hasHeader: true,
+			};
+
+			await writeCsv(data, config);
+
+			const content = fs.readFileSync(testOutputPath, "utf8");
+			expect(content).toBe('"ID","Name"\n"1","龍王"\n');
+		});
 	});
 });

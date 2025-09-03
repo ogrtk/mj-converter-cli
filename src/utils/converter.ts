@@ -1,4 +1,5 @@
-import type { FileConfig } from "../types/config.js";
+import type { CharacterSetValidation, FileConfig } from "../types/config.js";
+import { isCharacterEncodable } from "./character-set.js";
 import { readCsv } from "./csv.js";
 import { getLogger } from "./logger.js";
 import { joinCharacters, splitCharacters } from "./unicode.js";
@@ -119,6 +120,7 @@ export function convertStringWithHandling(
 	text: string,
 	conversionMap: ConversionMap,
 	missingCharacterHandling: "error" | "skip" | "warn",
+	characterSetValidation?: CharacterSetValidation,
 ): ConvertStringResult {
 	const chars = splitCharacters(text);
 	const convertedChars: string[] = [];
@@ -134,6 +136,39 @@ export function convertStringWithHandling(
 			}
 		} else {
 			// 変換ルールがない場合の処理
+			// 文字集合チェック
+			if (characterSetValidation?.enabled) {
+				if (
+					!isCharacterEncodable(char, characterSetValidation.targetEncoding)
+				) {
+					//
+					switch (characterSetValidation.undefinedCharacterHandling) {
+						case "error":
+							throw new Error(
+								`文字 "${char}" が ${characterSetValidation.targetEncoding} に含まれません`,
+							);
+						case "warn":
+							hasWarnings = true;
+							if (characterSetValidation.altChar) {
+								logger.warn(
+									`【警告】文字 "${char}" (U+${char.codePointAt(0)?.toString(16).padStart(4, "0")}) が ${characterSetValidation.targetEncoding} に含まれません。"${characterSetValidation.altChar}"に置換します。`,
+								);
+								convertedChars.push(characterSetValidation.altChar);
+								continue;
+							}
+							logger.warn(
+								`【警告】文字 "${char}" (U+${char.codePointAt(0)?.toString(16).padStart(4, "0")}) が ${characterSetValidation.targetEncoding} で含まれません（そのまま出力しています）。`,
+							);
+							convertedChars.push(char);
+							continue;
+
+						default:
+							break;
+					}
+				}
+			}
+
+			// 変換ルールなし文字の処理
 			switch (missingCharacterHandling) {
 				case "error":
 					throw new Error(`文字変換表に文字 "${char}" が見つかりません`);
@@ -165,6 +200,7 @@ export function convertCsvRecord(
 	targetColumns: number[],
 	conversionMap: ConversionMap,
 	missingCharacterHandling: "error" | "skip" | "warn",
+	characterSetValidation?: CharacterSetValidation,
 ): ConvertCsvRecordResult {
 	const logger = getLogger();
 	const convertedRecord = [...record];
@@ -177,6 +213,7 @@ export function convertCsvRecord(
 				originalValue,
 				conversionMap,
 				missingCharacterHandling,
+				characterSetValidation,
 			);
 			convertedRecord[columnIndex] = result.convertedValue;
 

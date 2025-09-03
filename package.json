@@ -10,6 +10,7 @@
     "dev": "tsx src/index.ts",
     "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --outfile=dist/cli.js --format=esm --packages=external",
     "start": "node dist/cli.js",
+    "mojimap-converter": "tsx src/mojimap-converter-cli.ts",
     "lint": "biome check src/ tests/",
     "lint:fix": "biome check --write src/ tests/",
     "format": "biome format --write src/ tests/",
