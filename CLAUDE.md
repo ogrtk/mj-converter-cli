@@ -34,7 +34,11 @@ npm run build
 npm start
 
 # Windows用実行 (batファイル)
-run.bat [設定ファイルパス]
+run.bat [設定ファイルパス] [--batch]
+
+# Windows実行オプション
+# ユーザモード: run.bat config.json - エラー時にpauseしてユーザー操作を待機
+# バッチモード: run.bat config.json --batch - エラー時にpauseせず自動終了（他プログラムからの呼び出し用）
 
 # コード品質管理
 npm run lint      # コードチェック

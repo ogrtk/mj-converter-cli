@@ -4,9 +4,51 @@ CSVファイルの指定した列に対して、文字変換表を使用して�
 
 ## 概要
 
-このツールは、CSV形式のデータファイル内の特定の列に対して、あらかじめ定義された変換表に基づいて文字を一対一で変換します。主に繁体字中国語の文字変換や、特定の文字セット間での変換作業に使用されることを想定しています。
-
+このツールは、CSV形式のデータファイル内の特定の列に対して、あらかじめ定義された変換表に基づいて文字を一対一で変換します。特定の文字セット間での変換作業に使用されることを想定しています。
 Unicode IVS（Ideographic Variation Sequence）に対応し、複雑な文字構成も正確に処理できます。
+
+## 変換処理フロー
+
+```mermaid
+flowchart LR
+    incsv[入力データの文字]
+    mojimap[文字変換表]
+
+    bunki1{変換表に文字が存在？}
+    bunki2{文字集合検証設定は有効？}
+    bunki3{文字集合の範囲内？}
+    trans1[変換処理]
+    trans2[対応表にあった文字に変換]
+    trans4[エラーまたは<br>警告・代替文字置換]
+    trans3[そのまま]
+    
+    incsv --> trans1
+    mojimap --> trans1
+    trans1 --> bunki1
+    bunki1 -->|存在| trans2
+    bunki1 -->|不存在| bunki2
+
+    bunki2 -->|有効| bunki3
+    bunki2 -->|無効| trans3  
+    bunki3 -->|範囲内| trans3
+    bunki3 -->|範囲外| trans4
+    
+```
+
+### 処理例
+
+**例1: 文字集合検証無効**
+入力ファイルより出力ファイルの方が、扱える文字セットが大きい用途を想定。
+- 入力文字「龍」→ 変換表で「龙」に変換 → 「龙」出力
+- 入力文字「𠮷」→ 変換表になし → 設定に応じて処理（`error`:エラーとして終了/`warn`:警告を出して続行/`skip`:何もしない）
+
+
+**例2: 文字集合検証有効（JIS90範囲チェック）**
+入力ファイルより出力ファイルの方が、扱える文字セットが小さい用途を想定。変換先が無い場合を考慮し、何らかの代替文字に置き換えることが可能。
+
+- 入力文字「龍」→ 変換表で「龙」に変換 → JIS90範囲内 → 「龙」出力
+- 入力文字「𠮷」→ 変換表になし → JIS90範囲外 → 警告 + 「■」に置換(`warn`とし、代替文字を設定)
+
 
 ## 主な機能
 
@@ -60,6 +102,9 @@ run.bat
 
 # 設定ファイルを指定
 run.bat my-config.json
+
+# バッチモード（他プログラムからの呼び出し用・エラー時pause無し）
+run.bat my-config.json --batch
 ```
 
 ### 開発モード
@@ -124,17 +169,17 @@ npm run dev
 - **output**: 出力ファイルの設定（inputと同様の項目）
 - **conversionTable**: 文字変換表CSVファイルのパス
 - **targetColumns**: 変換対象の列番号配列（0から開始）
-- **missingCharacterHandling**: 変換表にない文字の処理方法
-  - `error`: エラーで停止
-  - `skip`: 変換をスキップ
-  - `warn`: 警告を出力して継続
-- **characterSetValidation**: 文字エンコーディング検証設定（オプション）
+- **characterSetValidation**: 変換表にない文字の文字集合検証設定（オプション）
   - `enabled`: 検証機能の有効化
-  - `targetEncoding`: 対象エンコーディング（例: 'shift_jis', 'euc-jp'）
-  - `undefinedCharacterHandling`: 変換できない文字の処理方法
+  - `targetEncoding`: 対象エンコーディング（JIS90との検証の場合：'shift_jis', JIS2004との検証の場合：'shift_jis-2004'）
+  - `undefinedCharacterHandling`: 含まれない文字の処理方法
     - `error`: エラーで停止
     - `warn`: 警告を出力して継続
   - `altChar`: 警告時の置換文字（省略時はそのまま出力）
+- **missingCharacterHandling**: 変換表にない文字の処理方法（文字集合検証設定が無効時のみ動作）
+  - `error`: エラーで停止
+  - `skip`: 変換をスキップ
+  - `warn`: 警告を出力して継続
 
 #### logging
 - **level**: ログレベル（error, warn, info, debug）
@@ -191,7 +236,7 @@ npm run dev
 - `input.csv`: サンプル入力ファイル
 - `conversion.csv`: サンプル変換表
 - `output.csv`: 期待される出力結果
-- 各種設定例: `config.json`, `config-ivs.json`, `config-no-output-header.json`
+- 設定例: `config.json`
 
 ## ログ出力例
 

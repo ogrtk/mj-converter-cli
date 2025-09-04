@@ -1,10 +1,7 @@
 import * as path from "node:path";
 import type { ConversionConfig } from "./types/config.js";
 import { validateEncoding } from "./utils/character-set.js";
-import {
-	convertCsvRecord,
-	loadConversionTable,
-} from "./utils/converter.js";
+import { convertCsvRecord, loadConversionTable } from "./utils/converter.js";
 import { readCsv, writeCsv } from "./utils/csv.js";
 import { getLogger } from "./utils/logger.js";
 
@@ -57,7 +54,7 @@ export async function processConversion(
 				);
 			}
 			logger.info(
-				`文字エンコーディング検証を有効化: ${config.characterSetValidation.targetEncoding}`,
+				`文字集合検証を有効化: ${config.characterSetValidation.targetEncoding}`,
 			);
 			logger.info(
 				`未定義文字の処理方式: ${config.characterSetValidation.undefinedCharacterHandling}`,
