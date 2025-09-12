@@ -103,8 +103,17 @@ run.bat
 # 設定ファイルを指定
 run.bat my-config.json
 
+# 入力・出力ファイルをパラメータで指定（設定ファイルの値を上書き）
+run.bat --input data.csv --output result.csv
+
+# 設定ファイルと入力・出力ファイルの両方を指定
+run.bat my-config.json --input data.csv --output result.csv
+
 # バッチモード（他プログラムからの呼び出し用・エラー時pause無し）
 run.bat my-config.json --batch
+
+# 全パラメータを組み合わせ
+run.bat my-config.json --input data.csv --output result.csv --batch
 ```
 
 ### 開発モード
@@ -201,6 +210,36 @@ npm run dev
 - 1行目：変換前の文字
 - 2行目：変換後の文字
 
+### 文字対応表変換ユーティリティ
+
+`src/utils/mojimap-converter.ts`は、複数の文字情報を含むCSVファイルから、本ツールで使用する形式の変換表を生成するユーティリティです。
+**特定の団体専用のツールです。**
+
+#### 機能概要
+- **元データ処理**: HKコード、MJコード、IVSコード、Unicodeコードなどの複数文字情報を含むCSVを処理
+- **双方向変換表生成**: MJ→HK変換表とHK→MJ変換表の両方を自動生成
+- **文字優先順位**: IVS文字 > Real文字 > Unicode文字の優先順位で変換後文字を決定
+- **重複除去**: 同一文字ペアの重複を自動除去
+
+#### 入力データ形式
+```csv
+HKCode,HKChar,MJCode,KanjiLevel,RealCode,RealChar,IVSCode,IVSChar,UnicodeCode,UnicodeChar
+1-16-01,亜,1-16-01,1,U+4E9C,亞,,，U+4E9C,亞
+```
+
+#### 使用例
+```typescript
+import { convertMappingTable } from './src/utils/mojimap-converter';
+
+convertMappingTable(
+  'source-mapping.csv',      // 入力：複合文字情報CSV
+  'mj-to-hk.csv',           // 出力：MJ→HK変換表
+  'hk-to-mj.csv'            // 出力：HK→MJ変換表
+);
+```
+
+生成される変換表は本ツールの`conversionTable`設定で直接利用できます。
+
 ## プロジェクト構成
 
 ### ディレクトリ構造
@@ -217,6 +256,7 @@ npm run dev
 │       ├── converter.ts   # 文字変換ロジック
 │       ├── csv.ts         # CSV入出力
 │       ├── logger.ts      # ログ機能
+│       ├── mojimap-converter.ts # 文字対応表変換ユーティリティ
 │       └── unicode.ts     # Unicode文字処理
 ├── tests/                 # テストコード
 │   ├── unit/             # ユニットテスト

@@ -8,8 +8,9 @@ import { initLogger } from "./utils/logger.js";
 
 /**
  * 設定ファイルを読み込み、バリデーションを行う
+ * コマンドライン引数で指定されたファイルパスで設定を上書きする
  */
-function loadConfig(configPath: string): AppConfig {
+function loadConfig(configPath: string, inputPath?: string, outputPath?: string): AppConfig {
 	if (!fs.existsSync(configPath)) {
 		throw new Error(`設定ファイルが見つかりません: ${configPath}`);
 	}
@@ -23,12 +24,12 @@ function loadConfig(configPath: string): AppConfig {
 			throw new Error("設定ファイルに conversion セクションがありません");
 		}
 
-		if (!config.conversion.input?.path) {
-			throw new Error("入力ファイルパスが設定されていません");
+		if (!config.conversion.input?.path && !inputPath) {
+			throw new Error("入力ファイルパスが設定されていません（設定ファイルまたは--inputパラメータで指定してください）");
 		}
 
-		if (!config.conversion.output?.path) {
-			throw new Error("出力ファイルパスが設定されていません");
+		if (!config.conversion.output?.path && !outputPath) {
+			throw new Error("出力ファイルパスが設定されていません（設定ファイルまたは--outputパラメータで指定してください）");
 		}
 
 		if (!config.conversion.conversionTable) {
@@ -73,6 +74,14 @@ function loadConfig(configPath: string): AppConfig {
 			};
 		}
 
+		// コマンドライン引数でファイルパスを上書き
+		if (inputPath) {
+			config.conversion.input.path = inputPath;
+		}
+		if (outputPath) {
+			config.conversion.output.path = outputPath;
+		}
+
 		return config;
 	} catch (error) {
 		if (error instanceof SyntaxError) {
@@ -95,6 +104,16 @@ export async function main(): Promise<number> {
 				describe: "JSON設定ファイルのパス",
 				default: "config.json",
 			})
+			.option("input", {
+				alias: "i",
+				type: "string",
+				describe: "入力CSVファイルのパス（設定ファイルの値を上書き）",
+			})
+			.option("output", {
+				alias: "o",
+				type: "string",
+				describe: "出力CSVファイルのパス（設定ファイルの値を上書き）",
+			})
 			.option("verbose", {
 				alias: "v",
 				type: "boolean",
@@ -104,7 +123,7 @@ export async function main(): Promise<number> {
 			.help().argv;
 
 		// 設定ファイル読み込み
-		const config = loadConfig(argv.config);
+		const config = loadConfig(argv.config, argv.input, argv.output);
 
 		// verboseオプションが指定された場合はログレベルを変更
 		if (argv.verbose) {
@@ -115,6 +134,14 @@ export async function main(): Promise<number> {
 		const logger = initLogger(config.logging);
 		logger.info("CSV文字変換CLIツールを開始します");
 		logger.info(`設定ファイル: ${path.resolve(argv.config)}`);
+		
+		// ファイルパスの上書き情報をログ出力
+		if (argv.input) {
+			logger.info(`入力ファイルパスをパラメータで上書き: ${argv.input}`);
+		}
+		if (argv.output) {
+			logger.info(`出力ファイルパスをパラメータで上書き: ${argv.output}`);
+		}
 
 		// 入力ファイルの存在チェック
 		if (!fs.existsSync(config.conversion.input.path)) {

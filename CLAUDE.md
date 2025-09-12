@@ -17,6 +17,7 @@
   - `src/utils/csv.ts` - エンコーディング対応のCSVファイル入出力
   - `src/utils/converter.ts` - 変換表を使用した文字変換ロジック
   - `src/utils/character-set.ts` - iconv-liteを使用した文字エンコーディング検証
+  - `src/utils/mojimap-converter.ts` - 文字対応表変換・生成ユーティリティ
   - `src/utils/unicode.ts` - Unicode文字処理ユーティリティ
   - `src/utils/logger.ts` - Winstonベースのログシステム
 - **型定義**: `src/types/config.ts` - 設定インターフェースと型定義

@@ -13,7 +13,7 @@
       "lineBreak": "lf",
       "quote": "\"",
       "hasHeader": false,
-      "quoted": false
+      "quoted": true
     },
     "conversionTable": "mojimap/hk-to-mj.csv",
     "targetColumns": [
@@ -26,7 +26,7 @@
       "enabled": true,
       "targetEncoding": "shift_jis",
       "undefinedCharacterHandling": "warn",
-      "altChar": "?"
+      "altChar": "■"
     }
   },
   "logging": {
