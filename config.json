@@ -21,7 +21,7 @@
       2,
       4
     ],
-    "missingCharacterHandling": "warn",
+    "missingCharacterHandling": "skip",
     "characterSetValidation": {
       "enabled": true,
       "targetEncoding": "shift_jis",
