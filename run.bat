@@ -2,10 +2,10 @@
 chcp 65001 > nul
 setlocal enabledelayedexpansion
 
-:: CSVæ–‡å­—å¤‰æ›CLIãƒ„ãƒ¼ãƒ«å®Ÿè¡Œã‚¹ã‚¯ãƒªãƒ—ãƒˆ
-:: ä½¿ç”¨æ–¹æ³•: run.bat [è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹] [--input å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«] [--output å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«] [--batch]
+:: CSV•¶Žš•ÏŠ·CLIƒc[ƒ‹ŽÀsƒXƒNƒŠƒvƒg
+:: Žg—p•û–@: run.bat [Ý’èƒtƒ@ƒCƒ‹ƒpƒX] [--input “ü—Íƒtƒ@ƒCƒ‹] [--output o—Íƒtƒ@ƒCƒ‹] [--batch]
 
-:: ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è§£æž
+:: ƒpƒ‰ƒ[ƒ^‰ðÍ
 set CONFIG_FILE=config.json
 set BATCH_MODE=0
 set INPUT_FILE=
@@ -30,7 +30,7 @@ if "%~1"=="--output" (
     shift
     goto parse_args
 )
-:: æœ€åˆã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãŒ--ã§å§‹ã¾ã‚‰ãªã„å ´åˆã¯è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã¨ã—ã¦æ‰±ã†
+:: Å‰‚Ìƒpƒ‰ƒ[ƒ^‚ª--‚ÅŽn‚Ü‚ç‚È‚¢ê‡‚ÍÝ’èƒtƒ@ƒCƒ‹‚Æ‚µ‚Äˆµ‚¤
 if "%~1:~0,2%" neq "--" (
     set CONFIG_FILE=%~1
 )
@@ -39,60 +39,60 @@ goto parse_args
 
 :args_done
 
-:: ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿æƒ…å ±è¡¨ç¤º
-echo è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«: !CONFIG_FILE!
-if not "!INPUT_FILE!"=="" echo å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä¸Šæ›¸ã: !INPUT_FILE!
-if not "!OUTPUT_FILE!"=="" echo å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä¸Šæ›¸ã: !OUTPUT_FILE!
+:: ƒpƒ‰ƒ[ƒ^î•ñ•\Ž¦
+echo Ý’èƒtƒ@ƒCƒ‹: !CONFIG_FILE!
+if not "!INPUT_FILE!"=="" echo “ü—Íƒtƒ@ƒCƒ‹‚ðã‘‚«: !INPUT_FILE!
+if not "!OUTPUT_FILE!"=="" echo o—Íƒtƒ@ƒCƒ‹‚ðã‘‚«: !OUTPUT_FILE!
 
-:: è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®å­˜åœ¨ãƒã‚§ãƒƒã‚¯
+:: Ý’èƒtƒ@ƒCƒ‹‚Ì‘¶Ýƒ`ƒFƒbƒN
 if not exist "!CONFIG_FILE!" (
-    echo ã‚¨ãƒ©ãƒ¼: è¨­å®šãƒ•ã‚¡ã‚¤ãƒ« '!CONFIG_FILE!' ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚
+    echo ƒGƒ‰[: Ý’èƒtƒ@ƒCƒ‹ '!CONFIG_FILE!' ‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB
     if %BATCH_MODE% equ 0 pause
     exit /b 1
 )
 
-:: Node.jsã®å­˜åœ¨ãƒã‚§ãƒƒã‚¯
+:: Node.js‚Ì‘¶Ýƒ`ƒFƒbƒN
 where node >nul 2>&1
 if errorlevel 1 (
-    echo ã‚¨ãƒ©ãƒ¼: Node.jsãŒã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚
-    echo https://nodejs.org/ ã‹ã‚‰ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ã¦ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¦ãã ã•ã„ã€‚
+    echo ƒGƒ‰[: Node.js‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB
+    echo https://nodejs.org/ ‚©‚çƒ_ƒEƒ“ƒ[ƒh‚µ‚ÄƒCƒ“ƒXƒg[ƒ‹‚µ‚Ä‚­‚¾‚³‚¢B
     if %BATCH_MODE% equ 0 pause
     exit /b 1
 )
 
-:: package.jsonã®å­˜åœ¨ãƒã‚§ãƒƒã‚¯
+:: package.json‚Ì‘¶Ýƒ`ƒFƒbƒN
 if not exist "package.json" (
-    echo ã‚¨ãƒ©ãƒ¼: package.jsonãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚æ­£ã—ã„ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã§å®Ÿè¡Œã—ã¦ãã ã•ã„ã€‚
+    echo ƒGƒ‰[: package.json‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB³‚µ‚¢ƒfƒBƒŒƒNƒgƒŠ‚ÅŽÀs‚µ‚Ä‚­‚¾‚³‚¢B
     if %BATCH_MODE% equ 0 pause
     exit /b 1
 )
 
-:: ä¾å­˜é–¢ä¿‚ã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ç¢ºèª
+:: ˆË‘¶ŠÖŒW‚ÌƒCƒ“ƒXƒg[ƒ‹Šm”F
 if not exist "node_modules" (
-    echo ä¾å­˜é–¢ä¿‚ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ä¸­...
+    echo ˆË‘¶ŠÖŒW‚ðƒCƒ“ƒXƒg[ƒ‹’†...
     call npm install
     if errorlevel 1 (
-        echo ã‚¨ãƒ©ãƒ¼: ä¾å­˜é–¢ä¿‚ã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã«å¤±æ•—ã—ã¾ã—ãŸã€‚
+        echo ƒGƒ‰[: ˆË‘¶ŠÖŒW‚ÌƒCƒ“ƒXƒg[ƒ‹‚ÉŽ¸”s‚µ‚Ü‚µ‚½B
         if %BATCH_MODE% equ 0 pause
         exit /b 1
     )
 )
 
-:: ãƒ“ãƒ«ãƒ‰æ¸ˆã¿ãƒ•ã‚¡ã‚¤ãƒ«ã®ç¢ºèª
+:: ƒrƒ‹ƒhÏ‚Ýƒtƒ@ƒCƒ‹‚ÌŠm”F
 if not exist "dist\cli.js" (
-    echo ãƒ“ãƒ«ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ãƒ“ãƒ«ãƒ‰ã‚’å®Ÿè¡Œä¸­...
+    echo ƒrƒ‹ƒhƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒrƒ‹ƒh‚ðŽÀs’†...
     call npm run build
     if errorlevel 1 (
-        echo ã‚¨ãƒ©ãƒ¼: ãƒ“ãƒ«ãƒ‰ã«å¤±æ•—ã—ã¾ã—ãŸã€‚
+        echo ƒGƒ‰[: ƒrƒ‹ƒh‚ÉŽ¸”s‚µ‚Ü‚µ‚½B
         if %BATCH_MODE% equ 0 pause
         exit /b 1
     )
 )
 
-:: CSVå¤‰æ›ãƒ„ãƒ¼ãƒ«ã®å®Ÿè¡Œ
-echo CSVæ–‡å­—å¤‰æ›ãƒ„ãƒ¼ãƒ«ã‚’å®Ÿè¡Œä¸­...
+:: CSV•ÏŠ·ƒc[ƒ‹‚ÌŽÀs
+echo CSV•¶Žš•ÏŠ·ƒc[ƒ‹‚ðŽÀs’†...
 
-:: ã‚³ãƒžãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°ã‚’æ§‹ç¯‰
+:: ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚ð\’z
 set CLI_ARGS=--config "!CONFIG_FILE!"
 if not "!INPUT_FILE!"=="" (
     set CLI_ARGS=!CLI_ARGS! --input "!INPUT_FILE!"
@@ -105,13 +105,13 @@ node dist\cli.js !CLI_ARGS!
 set TOOL_EXIT_CODE=%errorlevel%
 
 if %TOOL_EXIT_CODE% equ 0 (
-    echo CSVå¤‰æ›å‡¦ç†ãŒå®Œäº†ã—ã¾ã—ãŸã€‚
+    echo CSV•ÏŠ·ˆ—‚ªŠ®—¹‚µ‚Ü‚µ‚½B
 ) else if %TOOL_EXIT_CODE% equ 2 (
-    echo è­¦å‘Š: CSVå¤‰æ›å‡¦ç†ã¯å®Œäº†ã—ã¾ã—ãŸãŒã€è­¦å‘ŠãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚ãƒ­ã‚°ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚
+    echo Œx: CSV•ÏŠ·ˆ—‚ÍŠ®—¹‚µ‚Ü‚µ‚½‚ªAŒx‚ª”­¶‚µ‚Ü‚µ‚½BƒƒO‚ðŠm”F‚µ‚Ä‚­‚¾‚³‚¢B
     if %BATCH_MODE% equ 0 pause
     exit /b 2
 ) else (
-    echo ã‚¨ãƒ©ãƒ¼: CSVå¤‰æ›å‡¦ç†ã«å¤±æ•—ã—ã¾ã—ãŸã€‚
+    echo ƒGƒ‰[: CSV•ÏŠ·ˆ—‚ÉŽ¸”s‚µ‚Ü‚µ‚½B
     if %BATCH_MODE% equ 0 pause
     exit /b %TOOL_EXIT_CODE%
 )
